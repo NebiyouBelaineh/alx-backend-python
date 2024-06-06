@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Module containing a funcion that adds two floating-point numbers."""
 
+
 def concat(str1: str, str2: str) -> str:
     """Concatenates two strings.
 
