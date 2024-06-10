@@ -2,6 +2,7 @@ import asyncio
 from typing import List
 """Module for printing the correct output of the wait_n coroutine"""
 
+
 wait_random = __import__('0-basic_async_syntax').wait_random
 
 
