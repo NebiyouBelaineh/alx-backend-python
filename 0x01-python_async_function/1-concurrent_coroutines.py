@@ -18,9 +18,9 @@ async def wait_n(n: int, max_delay: int = 10) -> List[float]:
         max_delay (int, optional): _description_. Defaults to 10.
 
     Returns:
-        List[float]: _description_
+        List[float]: _sorted list of delays
     """
-    delay = []
-    for _ in range(n):
-        delay += [await wait_random(max_delay)]
+    delay = await asyncio.gather(
+        *tuple(map(lambda _:wait_random(max_delay), range(n)))
+    )
     return sorted(delay)
