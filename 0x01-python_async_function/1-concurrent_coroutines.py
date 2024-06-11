@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 
 """Module for printing the correct output of the wait_n coroutine"""
 
