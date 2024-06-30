@@ -2,8 +2,11 @@
 """Module to test client.GithubOrgClient class"""
 import unittest
 from unittest.mock import Mock, patch
-from parameterized import parameterized
+from parameterized import parameterized, parameterized_class
 import client
+import fixtures
+import requests
+from fixtures import TEST_PAYLOAD
 
 
 class TestGithubOrgClient(unittest.TestCase):
@@ -66,3 +69,39 @@ class TestGithubOrgClient(unittest.TestCase):
         """Test static method has_license"""
         result = client.GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
+
+
+@parameterized_class(('org_payload',
+                      'repos_payload',
+                      'expected_repos',
+                      'apache2_repos'),
+                     TEST_PAYLOAD)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """Integration test for GithubOrgClient"""
+    @classmethod
+    def setUpClass(cls):
+        """Set up class method to start patching."""
+        cls.get_patcher = patch('requests.get')
+        cls.mock_get = cls.get_patcher.start()
+
+        def side_effect(url):
+            if url == 'https://api.github.com/orgs/google':
+                response = Mock()
+                response.json.return_value = cls.org_payload
+                return response
+            elif url == 'https://api.github.com/orgs/google/repos':
+                response = Mock()
+                response.json.return_value = cls.repos_payload
+                return response
+
+        cls.mock_get.side_effect = side_effect
+
+    @classmethod
+    def tearDownClass(cls):
+        """Tear down class method to stop patching."""
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """Test public_repos method."""
+        cli = client.GithubOrgClient('google')
+        self.assertEqual(cli.public_repos(), self.expected_repos)
